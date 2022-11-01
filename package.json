@@ -1,0 +1,32 @@
+{
+  "name": "ac-sync-server",
+  "version": "0.0.1",
+  "description": "Synchorize data between local and cloud for Access control",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "nodemon src/index.js",
+    "prisma:update": "npx prisma db pull --schema src/prisma/maindb.schema.prisma && npx prisma db pull --schema src/prisma/subdb.schema.prisma",
+    "prisma:generate": "npx prisma generate --schema src/prisma/maindb.schema.prisma && npx prisma generate --schema src/prisma/subdb.schema.prisma"
+  },
+  "author": "Emddi",
+  "license": "ISC",
+  "dependencies": {
+    "@prisma/client": "^4.5.0",
+    "compression": "^1.7.4",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.1",
+    "express": "^4.18.1",
+    "helmet": "^5.1.1",
+    "http-status": "^1.5.2",
+    "joi": "^17.6.0",
+    "mysql2": "^2.3.3",
+    "prisma": "^4.5.0",
+    "winston": "^3.8.1",
+    "xss-clean": "^0.1.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.19",
+    "prettier": "^2.7.1"
+  }
+}

@@ -1,0 +1,1963 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "./generated/maindb"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("PRISMA_DB_MAIN")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model Khoa {
+  Makhoa  String @db.VarChar(10)
+  Tenkhoa String @db.VarChar(100)
+
+  @@ignore
+}
+
+model aTest {
+  id         Int     @id @unique(map: "id_UNIQUE") @default(autoincrement())
+  start_time String? @db.VarChar(225)
+}
+
+model action {
+  action_id Int     @id @default(autoincrement())
+  module_id Int
+  name      String  @db.VarChar(225)
+  code      String? @db.VarChar(10)
+  path_run  String  @default("/") @db.VarChar(100)
+}
+
+model app_info {
+  app_info_id Int      @id @default(autoincrement())
+  name        String   @db.VarChar(45)
+  type        Boolean  @default(true)
+  os          Boolean
+  cur_version Int      @db.SmallInt
+  min_version Int      @db.SmallInt
+  link_update String   @db.VarChar(255)
+  created_at  DateTime @default(now()) @db.Timestamp(0)
+  updated_at  DateTime @default(now()) @db.Timestamp(0)
+}
+
+model bank {
+  id         Int      @id @default(autoincrement())
+  bank_code  String   @db.VarChar(45)
+  bank_name  String   @db.VarChar(145)
+  logo       String   @default("https://cdn.vietnambiz.vn/2020/4/8/bank-getty-15863402183402114868941.jpg") @db.VarChar(245)
+  created_at DateTime @default(now()) @db.DateTime(0)
+}
+
+model black_list {
+  customer_id String   @db.VarChar(16)
+  driver_id   String   @db.VarChar(16)
+  note        String   @db.VarChar(500)
+  created_at  DateTime @default(now()) @db.Timestamp(0)
+  customer    customer @relation(fields: [customer_id], references: [customer_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_bl_customer")
+  driver      driver   @relation(fields: [driver_id], references: [driver_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_bl_driver")
+
+  @@id([customer_id, driver_id])
+  @@index([driver_id], map: "fk_bl_driver_idx")
+}
+
+model booking {
+  booking_id           String    @id @db.VarChar(20)
+  customer_id          String    @db.VarChar(16)
+  driver_id            String?   @db.VarChar(16)
+  service_id           Int
+  price_id             Int
+  vehicle_id           Int?
+  reason_id            Int?
+  priority_id          Int       @default(0)
+  payment_id           Int       @default(1)
+  promotion_id         Int?
+  app_id               Boolean?
+  type                 Boolean   @default(true)
+  start_address        String?   @db.VarChar(500)
+  end_address          String?   @db.VarChar(500)
+  start_point          String?   @db.VarChar(50)
+  waypoints            String?   @db.VarChar(1000)
+  list_driver          String?   @db.VarChar(100)
+  start_time           DateTime  @db.DateTime(0)
+  meter_switch         Boolean   @default(false)
+  estimated_time       Float     @default(0.0) @db.Float
+  status               Boolean   @default(false)
+  distance             Float?    @db.Float
+  note                 String?   @db.VarChar(255)
+  type_charged         Boolean   @default(true)
+  round_trip           Boolean   @default(false)
+  cancel               Boolean?  @default(false)
+  other_reason         String?   @db.VarChar(255)
+  license_plate        String?   @db.VarChar(16)
+  total_price          Float?    @db.Float
+  discount             Float     @default(0) @db.Float
+  rate_price           Float     @default(1.0) @db.Float
+  is_rush              Boolean   @default(false)
+  count_call           Boolean   @default(true)
+  customer_app_version Int?      @db.SmallInt
+  customer_phone_name  String?   @db.VarChar(225)
+  customer_phone_os    String?   @db.VarChar(45)
+  driver_app_version   Int?
+  driver_phone_name    String?   @db.VarChar(225)
+  driver_phone_os      String?   @db.VarChar(45)
+  currency             String    @default("₫") @db.VarChar(5)
+  queued               Boolean   @default(false)
+  deleted              Boolean   @default(false)
+  payment_gateway      String?   @db.VarChar(15)
+  booking_time         DateTime? @db.DateTime(0)
+  accept_time          DateTime? @db.DateTime(0)
+  cancel_time          DateTime? @db.DateTime(0)
+  journey_status       Boolean   @default(false)
+  paid_surcharge       Boolean   @default(false)
+  add_customer         String?   @db.VarChar(15)
+  add_data             String?   @db.VarChar(100)
+
+  @@index([customer_id], map: "fk_booking_customer_idx")
+  @@index([driver_id], map: "fk_booking_driver_idx")
+  @@index([payment_id], map: "fk_booking_payment_idx")
+  @@index([price_id], map: "fk_booking_price_idx")
+  @@index([reason_id], map: "fk_booking_reason_idx")
+  @@index([service_id], map: "fk_booking_service_idx")
+  @@index([vehicle_id], map: "fk_booking_vehicle_idx")
+  @@index([app_id], map: "idx_appid")
+  @@index([start_time], map: "idx_start_time")
+  @@index([type], map: "idx_type")
+}
+
+model bookingOLD {
+  booking_id           String                @id @db.VarChar(20)
+  customer_id          String                @db.VarChar(16)
+  driver_id            String?               @db.VarChar(16)
+  region_id            Int?
+  service_id           Int
+  price_id             Int
+  vehicle_id           Int?
+  reason_id            Int?
+  ratio_id             Int                   @default(1)
+  priority_id          Int                   @default(0)
+  payment_id           Int                   @default(1)
+  promotion_id         Int?
+  app_id               Boolean?
+  type                 Boolean               @default(true)
+  start_address        String?               @db.VarChar(500)
+  end_address          String?               @db.VarChar(500)
+  start_point          String?               @db.VarChar(45)
+  start_pointb         Unsupported("point")?
+  end_pointb           Unsupported("point")?
+  waypoints            Json?
+  list_driver          Json?
+  start_time           DateTime              @db.DateTime(0)
+  meter_switch         Boolean               @default(false)
+  estimated_time       Float                 @default(0.0) @db.Float
+  status               Boolean               @default(false)
+  add_customer         String?               @db.VarChar(15)
+  distance             Float?                @db.Float
+  note                 String?               @db.VarChar(255)
+  type_charged         Boolean               @default(true)
+  round_trip           Boolean               @default(false)
+  cancel               Boolean?              @default(false)
+  other_reason         String?               @db.VarChar(255)
+  license_plate        String?               @db.VarChar(16)
+  total_price          Float?                @db.Float
+  discount             Float                 @default(0) @db.Float
+  rate_price           Float                 @default(1.0) @db.Float
+  count_call           Boolean               @default(true)
+  customer_app_version Int?                  @db.SmallInt
+  customer_phone_name  String?               @db.VarChar(225)
+  customer_phone_os    String?               @db.VarChar(45)
+  driver_app_version   Int?
+  driver_phone_name    String?               @db.VarChar(225)
+  driver_phone_os      String?               @db.VarChar(45)
+  currency             String                @default("₫") @db.VarChar(5)
+  is_rush              Boolean               @default(false)
+  queued               Boolean               @default(false)
+  deleted              Boolean               @default(false)
+  payment_gateway      String?               @db.VarChar(15)
+  customer             customer              @relation(fields: [customer_id], references: [customer_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_booking_customer")
+  driver               driver?               @relation(fields: [driver_id], references: [driver_id], onDelete: NoAction, map: "fk_booking_driver")
+  price                price                 @relation(fields: [price_id], references: [price_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_booking_price")
+  priority             priority              @relation(fields: [priority_id], references: [priority_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_booking_priority")
+  reason               reason?               @relation(fields: [reason_id], references: [reason_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_booking_reason")
+  vehicle              vehicle?              @relation(fields: [vehicle_id], references: [vehicle_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_booking_vehicle")
+
+  @@index([driver_id], map: "fk_booking_driver_idx")
+  @@index([payment_id], map: "fk_booking_payment_idx")
+  @@index([price_id], map: "fk_booking_price_idx")
+  @@index([priority_id], map: "fk_booking_priority_idx")
+  @@index([ratio_id], map: "fk_booking_ration_idx")
+  @@index([reason_id], map: "fk_booking_reason_idx")
+  @@index([service_id], map: "fk_booking_service_idx")
+  @@index([customer_id], map: "fk_booking_user_idx")
+  @@index([vehicle_id], map: "fk_booking_vehicle_idx")
+  @@index([app_id], map: "idx_appid_b")
+}
+
+model booking_appb {
+  booking_id           String    @id @db.VarChar(20)
+  customer_id          String    @db.VarChar(16)
+  driver_id            String?   @db.VarChar(16)
+  service_id           Int
+  price_id             Int
+  vehicle_id           Int?
+  reason_id            Int?
+  priority_id          Int       @default(0)
+  payment_id           Int       @default(1)
+  promotion_id         Int?
+  app_id               Boolean?
+  type                 Boolean   @default(true)
+  start_address        String?   @db.VarChar(500)
+  end_address          String?   @db.VarChar(500)
+  start_point          String?   @db.VarChar(50)
+  waypoints            String?   @db.VarChar(1000)
+  list_driver          String?   @db.VarChar(100)
+  start_time           DateTime  @db.DateTime(0)
+  meter_switch         Boolean   @default(false)
+  estimated_time       Float     @default(0.0) @db.Float
+  status               Boolean   @default(false)
+  add_customer         String?   @db.VarChar(15)
+  distance             Float?    @db.Float
+  note                 String?   @db.VarChar(255)
+  type_charged         Boolean   @default(true)
+  round_trip           Boolean   @default(false)
+  cancel               Boolean?  @default(false)
+  other_reason         String?   @db.VarChar(255)
+  license_plate        String?   @db.VarChar(16)
+  total_price          Float?    @db.Float
+  discount             Float     @default(0) @db.Float
+  rate_price           Float     @default(1.0) @db.Float
+  count_call           Boolean   @default(true)
+  customer_app_version Int?      @db.SmallInt
+  customer_phone_name  String?   @db.VarChar(225)
+  customer_phone_os    String?   @db.VarChar(45)
+  driver_app_version   Int?
+  driver_phone_name    String?   @db.VarChar(225)
+  driver_phone_os      String?   @db.VarChar(45)
+  currency             String    @default("₫") @db.VarChar(5)
+  is_rush              Boolean   @default(false)
+  queued               Boolean   @default(false)
+  deleted              Boolean   @default(false)
+  payment_gateway      String?   @db.VarChar(15)
+  accept_time          DateTime? @db.DateTime(0)
+  cancel_time          DateTime? @db.DateTime(0)
+  status_journey       Boolean   @default(false)
+
+  @@index([driver_id], map: "fk_booking_driver_idx")
+  @@index([payment_id], map: "fk_booking_payment_idx")
+  @@index([price_id], map: "fk_booking_price_idx")
+  @@index([reason_id], map: "fk_booking_reason_idx")
+  @@index([service_id], map: "fk_booking_service_idx")
+  @@index([customer_id], map: "fk_booking_user_idx")
+  @@index([vehicle_id], map: "fk_booking_vehicle_idx")
+  @@index([app_id], map: "idx_appid_b")
+  @@index([start_time], map: "idx_start_time")
+}
+
+model booking_partner {
+  booking_id           String    @id @db.VarChar(20)
+  customer_id          String    @db.VarChar(16)
+  driver_id            String?   @db.VarChar(16)
+  service_id           Int
+  price_id             Int
+  vehicle_id           Int?
+  reason_id            Int?
+  priority_id          Int       @default(0)
+  payment_id           Int       @default(1)
+  promotion_id         Int?
+  app_id               Boolean?
+  type                 Boolean   @default(true)
+  start_address        String?   @db.VarChar(500)
+  end_address          String?   @db.VarChar(500)
+  start_point          String?   @db.VarChar(50)
+  waypoints            String?   @db.VarChar(1000)
+  list_driver          String?   @db.VarChar(100)
+  start_time           DateTime  @db.DateTime(0)
+  meter_switch         Boolean   @default(false)
+  estimated_time       Float     @default(0.0) @db.Float
+  status               Boolean   @default(false)
+  add_data             String?   @db.VarChar(100)
+  distance             Float?    @db.Float
+  note                 String?   @db.VarChar(255)
+  type_charged         Boolean   @default(true)
+  round_trip           Boolean   @default(false)
+  cancel               Boolean?  @default(false)
+  other_reason         String?   @db.VarChar(255)
+  license_plate        String?   @db.VarChar(16)
+  total_price          Float?    @db.Float
+  discount             Float     @default(0) @db.Float
+  rate_price           Float     @default(1.0) @db.Float
+  count_call           Boolean   @default(true)
+  customer_app_version Int?      @db.SmallInt
+  customer_phone_name  String?   @db.VarChar(225)
+  customer_phone_os    String?   @db.VarChar(45)
+  driver_app_version   Int?
+  driver_phone_name    String?   @db.VarChar(225)
+  driver_phone_os      String?   @db.VarChar(45)
+  currency             String    @default("₫") @db.VarChar(5)
+  is_rush              Boolean   @default(false)
+  queued               Boolean   @default(false)
+  deleted              Boolean   @default(false)
+  payment_gateway      String?   @db.VarChar(15)
+  booking_time         DateTime? @db.DateTime(0)
+  accept_time          DateTime? @db.DateTime(0)
+  cancel_time          DateTime? @db.DateTime(0)
+  journey_status       Boolean   @default(false)
+  surcharge_paid       Boolean   @default(false)
+  add_customer         String?   @db.VarChar(15)
+
+  @@index([app_id], map: "idx_appid_b")
+  @@index([start_time], map: "idx_start_time")
+}
+
+model business {
+  business_id  Int      @id @default(autoincrement())
+  name         String   @db.VarChar(250)
+  phone_number String   @unique(map: "phone_number_UNIQUE") @db.VarChar(15)
+  email        String   @unique(map: "email_UNIQUE") @db.VarChar(100)
+  office_id    Int
+  credit_line  Int      @default(10000)
+  deleted      Boolean? @default(false)
+  locked       Boolean? @default(false)
+  created_at   DateTime @default(now()) @db.Timestamp(0)
+}
+
+model businessbooking {
+  id          BigInt  @id @default(autoincrement()) @db.UnsignedBigInt
+  bookingId   String  @db.VarChar(20)
+  description String? @db.Text
+  customerId  String? @db.VarChar(100)
+  cardId      BigInt?
+}
+
+model businesscard {
+  id             BigInt               @id @default(autoincrement())
+  v              Int?                 @default(0) @map("__v")
+  is_deleted     Boolean?             @default(false) @map("_is_deleted")
+  status         businesscard_status? @default(active)
+  name           String?              @db.VarChar(255)
+  number         String?              @db.VarChar(255)
+  office_id      BigInt
+  passenger_id   String               @db.VarChar(255)
+  cash_limit     Float?               @default(0) @db.Float
+  password       String?              @db.VarChar(255)
+  updated_at     BigInt?
+  created_at     BigInt?
+  businessoffice businessoffice       @relation(fields: [office_id], references: [id], onUpdate: Restrict, map: "businesscard_ibfk_1")
+  customer       customer             @relation(fields: [passenger_id], references: [customer_id], onUpdate: Restrict, map: "businesscard_ibfk_2")
+
+  @@index([office_id], map: "office_id")
+  @@index([passenger_id], map: "passenger_id")
+}
+
+model businessoffice {
+  id           BigInt                 @id @default(autoincrement())
+  v            Int?                   @default(0) @map("__v")
+  is_deleted   Boolean?               @default(false) @map("_is_deleted")
+  name         String                 @db.VarChar(255)
+  code         String                 @db.VarChar(255)
+  slug         String                 @db.VarChar(255)
+  type         businessoffice_type?
+  address      String?                @db.VarChar(255)
+  level        Int?
+  currency     String?                @default("VNĐ") @db.VarChar(255)
+  ref_id       BigInt?
+  email        String?                @db.VarChar(255)
+  fax          String?                @db.VarChar(255)
+  phone        String?                @db.VarChar(255)
+  status       businessoffice_status? @default(default)
+  parent_id    BigInt?
+  updated_at   BigInt?
+  created_at   BigInt?
+  businesscard businesscard[]
+
+  @@index([slug], map: "businessoffice_slug")
+}
+
+model cal_tax_milestone {
+  id               Int @id @unique(map: "id_UNIQUE") @default(autoincrement()) @db.UnsignedMediumInt
+  office_id        Int
+  first_milestone  Int @db.SmallInt
+  second_milestone Int @db.SmallInt
+  deleted          Int @default(0) @db.UnsignedTinyInt
+}
+
+model cal_tax_route {
+  id         Int     @id @default(autoincrement()) @db.UnsignedInt
+  office_id  Int
+  route_name String  @db.VarChar(255)
+  distance   String  @db.VarChar(5)
+  seats      String  @db.VarChar(10)
+  price_1    String  @db.VarChar(20)
+  price_2    String  @db.VarChar(20)
+  time_1     String? @db.VarChar(5)
+  time_2     String? @db.VarChar(5)
+  deleted    Boolean @default(false)
+}
+
+model cal_tax_service {
+  id         Int    @id @unique(map: "id_UNIQUE") @default(autoincrement()) @db.UnsignedSmallInt
+  ctm_id     Int    @db.MediumInt
+  name       String @db.VarChar(45)
+  go_price   Int    @db.UnsignedSmallInt
+  back_price Int    @db.UnsignedSmallInt
+  deleted    Int    @default(0) @db.UnsignedTinyInt
+}
+
+model category {
+  category_id Int     @id @default(autoincrement())
+  name        String  @db.VarChar(225)
+  type        Boolean @default(false)
+  short       String? @db.VarChar(225)
+  office_id   Int?
+  iorder      Boolean @default(false)
+}
+
+model config_server {
+  id                        Int      @id @default(autoincrement())
+  draw_way                  Boolean  @default(false)
+  time_booking              Int
+  time_booking_server       Int
+  time_coming               Int
+  time_journey              Int
+  time_get_driver_location  Int
+  time_send_driver_location Int
+  link_about                String?  @db.VarChar(255)
+  link_register             String?  @db.VarChar(255)
+  created_at                DateTime @default(now()) @db.Timestamp(0)
+  updated_at                DateTime @default(now()) @db.Timestamp(0)
+}
+
+model coor {
+  id           Int                  @id @default(autoincrement())
+  cur_location Unsupported("point")
+
+  @@index([cur_location(length: 32)], map: "idx_pt")
+}
+
+model coor1 {
+  id         Int      @default(autoincrement())
+  created_at DateTime @default(now()) @db.DateTime(0)
+
+  @@unique([id, created_at], map: "id")
+}
+
+model coordinator {
+  id             BigInt    @id @default(autoincrement())
+  service_id     Int?
+  add_service    Int?
+  user_id        Int
+  customer_id    String?   @db.VarChar(16)
+  phone_number   String?   @db.VarChar(15)
+  booking_id     String?   @db.VarChar(20)
+  count_call     Boolean   @default(false)
+  start_address  String?   @db.VarChar(255)
+  end_address    String?   @db.VarChar(255)
+  start_point    String?   @db.VarChar(45)
+  end_point      String?   @db.VarChar(45)
+  type           Boolean   @default(false)
+  number_vh      Boolean   @default(true)
+  status         Boolean?  @default(false)
+  is_grp         Boolean   @default(false)
+  line           Boolean?
+  switchboard    Int?      @db.SmallInt
+  check_sb       Boolean   @default(false)
+  cmd_cd         String?   @db.VarChar(5)
+  cmd_sb         String?   @db.VarChar(5)
+  cmd_cc         String?   @db.VarChar(5)
+  list_vh        String?   @db.VarChar(45)
+  list_arrived   String?   @db.VarChar(45)
+  vh_code        String?   @db.VarChar(15)
+  marketing      Boolean   @default(false)
+  marketing_id   Int?
+  deleted        Boolean   @default(false)
+  created_at     DateTime  @default(now()) @db.DateTime(0)
+  note           String?   @db.VarChar(200)
+  reason_cancel  String?   @db.VarChar(145)
+  area_code      Boolean?  @default(false)
+  total_price    Int?
+  discount       Int?
+  surcharge      Int?
+  booking_time   DateTime? @db.DateTime(0)
+  cancel_time    DateTime? @db.DateTime(0)
+  journey_status Boolean   @default(false)
+  add_data       String?   @db.VarChar(100)
+  accept_time    DateTime? @db.DateTime(0)
+
+  @@index([switchboard], map: "cd_swb_idx")
+  @@index([booking_id], map: "fk_coordinator_booking")
+  @@index([marketing_id], map: "fk_coordinator_marketing_idx")
+  @@index([service_id], map: "fk_coordinator_service_idx")
+  @@index([user_id], map: "fk_coordinator_user_idx")
+  @@index([created_at], map: "idx_created_at")
+  @@index([marketing], map: "idx_marketing")
+  @@index([type], map: "type_idx")
+}
+
+model coordinator6 {
+  id            BigInt   @default(autoincrement())
+  service_id    Int?
+  add_service   Int?
+  user_id       Int
+  customer_id   String?  @db.VarChar(16)
+  phone_number  String?  @db.VarChar(15)
+  booking_id    String?  @db.VarChar(20)
+  count_call    Boolean  @default(false)
+  start_address String?  @db.VarChar(255)
+  start_point   String?  @db.VarChar(45)
+  type          Boolean  @default(false)
+  number_vh     Boolean  @default(true)
+  status        Boolean? @default(false)
+  is_grp        Boolean  @default(false)
+  line          Boolean?
+  switchboard   Int?     @db.SmallInt
+  check_sb      Boolean  @default(false)
+  cmd_cd        String?  @db.VarChar(5)
+  cmd_sb        String?  @db.VarChar(5)
+  cmd_cc        String?  @db.VarChar(5)
+  list_vh       String?  @db.VarChar(45)
+  list_arrived  String?  @db.VarChar(45)
+  vh_code       String?  @db.VarChar(15)
+  marketing     Boolean  @default(false)
+  marketing_id  Int?
+  deleted       Boolean  @default(false)
+  created_at    DateTime @default(now()) @db.DateTime(0)
+  note          String?  @db.VarChar(200)
+  reason_cancel String?  @db.VarChar(145)
+  area_code     Boolean? @default(false)
+
+  @@unique([id, created_at], map: "id")
+  @@index([switchboard], map: "cd_swb_idx")
+  @@index([booking_id], map: "fk_coordinator_booking")
+  @@index([service_id], map: "fk_coordinator_service_idx")
+  @@index([user_id], map: "fk_coordinator_user_idx")
+}
+
+model coordinator_contract {
+  id            Int       @id @default(autoincrement())
+  user_id       String    @db.VarChar(15)
+  phone_number  String?   @default("null") @db.VarChar(15)
+  driver_name   String?   @default("null") @db.VarChar(45)
+  vh_code       String    @db.VarChar(15)
+  line          Boolean   @default(false)
+  switchboard   String    @db.VarChar(15)
+  start_address String?   @default("null") @db.VarChar(100)
+  end_address   String?   @default("null") @db.VarChar(100)
+  status        Boolean?  @default(false)
+  note          String?   @default("null") @db.VarChar(50)
+  created_at    DateTime? @default(now()) @db.Timestamp(0)
+}
+
+model coordinator_new {
+  id            BigInt   @id @default(autoincrement())
+  service_id    Int?
+  add_service   Int?
+  user_id       Int
+  customer_id   String?  @db.VarChar(16)
+  phone_number  String?  @db.VarChar(15)
+  booking_id    String?  @db.VarChar(20)
+  count_call    Boolean  @default(false)
+  start_address String?  @db.VarChar(255)
+  start_point   String?  @db.VarChar(45)
+  type          Boolean  @default(false)
+  number_vh     Boolean  @default(true)
+  status        Boolean? @default(false)
+  is_grp        Boolean  @default(false)
+  line          Boolean?
+  switchboard   Int?     @db.SmallInt
+  check_sb      Boolean  @default(false)
+  cmd_cd        String?  @db.VarChar(5)
+  cmd_sb        String?  @db.VarChar(5)
+  cmd_cc        String?  @db.VarChar(5)
+  list_vh       String?  @db.VarChar(45)
+  list_arrived  String?  @db.VarChar(45)
+  vh_code       String?  @db.VarChar(15)
+  marketing     Boolean  @default(false)
+  marketing_id  Int?
+  deleted       Boolean  @default(false)
+  created_at    DateTime @default(now()) @db.Timestamp(0)
+  note          String?  @db.VarChar(200)
+  reason_cancel String?  @db.VarChar(145)
+  area_code     Boolean? @default(false)
+
+  @@index([switchboard], map: "cd_swb_idx")
+  @@index([booking_id], map: "fk_coordinator_booking")
+  @@index([marketing_id], map: "fk_coordinator_marketing_idx")
+  @@index([service_id], map: "fk_coordinator_service_idx")
+  @@index([user_id], map: "fk_coordinator_user_idx")
+  @@index([created_at], map: "idx_created_at")
+  @@index([marketing], map: "idx_marketing")
+}
+
+model coordinator_sort {
+  id            Int       @id @default(autoincrement())
+  user_id       String    @db.VarChar(15)
+  phone_number  String?   @db.VarChar(15)
+  driver_name   String?   @db.VarChar(45)
+  vh_code       String    @db.VarChar(15)
+  line          Boolean   @default(false)
+  switchboard   String    @db.VarChar(15)
+  start_address String?   @db.VarChar(150)
+  street        String?   @db.VarChar(45)
+  status        Boolean?  @default(false)
+  note          String?   @db.VarChar(100)
+  ranking       Boolean   @default(false)
+  created_at    DateTime? @default(now()) @db.Timestamp(0)
+  vh_type       Boolean?  @default(false)
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model coordinatorc {
+  id            BigInt   @db.UnsignedBigInt
+  service_id    Int?
+  user_id       Int
+  customer_id   String?  @db.VarChar(16)
+  booking_id    String?  @db.VarChar(20)
+  start_address String?  @db.VarChar(255)
+  start_point   String?  @db.VarChar(45)
+  type          Boolean  @default(false)
+  switchboard   Int?     @db.SmallInt
+  created_at    DateTime @default(now()) @db.DateTime(0)
+
+  @@unique([id, switchboard, created_at], map: "idx_unique")
+  @@index([booking_id], map: "idx_booking")
+  @@index([customer_id], map: "idx_customer")
+  @@index([service_id], map: "idx_service_id")
+  @@index([created_at], map: "idx_time")
+  @@ignore
+}
+
+model coors {
+  id           Int                  @id @default(autoincrement())
+  cur_location Unsupported("point")
+}
+
+model customer {
+  customer_id         String                @id @db.VarChar(16)
+  office_id           Int                   @default(8)
+  phone_number        String                @unique(map: "phone_number_UNIQUE") @db.VarChar(15)
+  password            String                @db.VarChar(255)
+  full_name           String                @db.VarChar(255)
+  type                Boolean               @default(false)
+  email               String?               @db.VarChar(100)
+  email_verified      Boolean               @default(false)
+  rate                Float?                @default(5.00) @db.Float
+  invite_code         String                @db.VarChar(15)
+  invite_by           String?               @db.VarChar(15)
+  invite_time         DateTime?             @db.DateTime(0)
+  last_login          String?               @db.VarChar(15)
+  check_login         String?               @db.VarChar(15)
+  verified            Boolean               @default(false)
+  verify_count        Int                   @default(0)
+  verify_code         String                @db.VarChar(6)
+  is_online           Boolean               @default(false)
+  status              Boolean               @default(false)
+  location            Unsupported("point")?
+  country_code        String?               @default("+84") @db.VarChar(10)
+  facebook_id         String?               @unique(map: "facebook_id_UNIQUE") @db.VarChar(45)
+  google_id           String?               @unique(map: "google_id_UNIQUE") @db.VarChar(45)
+  block               Boolean               @default(false)
+  address             String?               @db.VarChar(255)
+  company             String?               @db.VarChar(255)
+  avatar              String                @default("http://sdev.emddi.com/images/customer/defaultavatar.png") @db.VarChar(255)
+  app_code            String?               @db.VarChar(10)
+  app_os              Boolean               @default(false)
+  app_version         Int?                  @db.SmallInt
+  phone_name          String?               @db.VarChar(45)
+  phone_os            String?               @db.VarChar(45)
+  language            String                @default("vi") @db.VarChar(10)
+  device_token        String?               @db.VarChar(225)
+  region_id           Int                   @default(2)
+  region_name         String?               @db.VarChar(45)
+  visited             String?               @db.VarChar(200)
+  add_phone           String?               @db.VarChar(200)
+  total_point         Int                   @default(0)
+  point               Int                   @default(0)
+  wallet              Float                 @default(0) @db.Float
+  wallet_holding      Float                 @default(0) @db.Float
+  expiried_wallet     DateTime?             @db.DateTime(0)
+  currency            String                @default("₫") @db.VarChar(5)
+  register_by         Boolean               @default(true)
+  group_marketing_id  Int?
+  region_marketing_id Int?
+  marketing_name      String?               @db.VarChar(45)
+  cur_location        String?               @db.VarChar(45)
+  type_marketing_id   Int?                  @default(0)
+  marketing_id        Int?
+  created_at          DateTime              @default(now()) @db.Timestamp(0)
+  updated_at          DateTime              @default(now()) @db.Timestamp(0)
+  marketing           marketing?            @relation(fields: [marketing_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_customer_marketing")
+  office              office                @relation(fields: [office_id], references: [office_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_customer_office")
+  black_list          black_list[]
+  bookingOLD          bookingOLD[]
+  businesscard        businesscard[]
+  customer_black_list customer_black_list[]
+  message             message[]
+  promotion_customer  promotion_customer[]
+  user_device_token   user_device_token[]
+
+  @@index([marketing_id], map: "fk_customer_marketing_idx")
+  @@index([office_id], map: "fk_customer_office_idx")
+}
+
+model customer_app {
+  customer_id  String   @db.VarChar(15)
+  app_id       String   @db.VarChar(15)
+  last_login   String?  @db.VarChar(15)
+  check_login  String?  @db.VarChar(15)
+  last_trip_id String?  @db.VarChar(20)
+  created_at   DateTime @default(now()) @db.DateTime(0)
+
+  @@id([customer_id, app_id])
+}
+
+model customer_black_list {
+  customer_id   String   @db.VarChar(16)
+  driver_id     String   @db.VarChar(16)
+  expiried_date DateTime @db.DateTime(0)
+  customer      customer @relation(fields: [customer_id], references: [customer_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_cbl_customer")
+  driver        driver   @relation(fields: [driver_id], references: [driver_id], onDelete: NoAction, map: "fk_cbl_driver")
+
+  @@id([customer_id, expiried_date, driver_id])
+  @@index([driver_id], map: "fk_cbl_driver_idx")
+}
+
+model customer_transaction {
+  customer_transaction_id String   @id @db.VarChar(14)
+  customer_id             String   @db.VarChar(16)
+  trans_id                String?  @unique(map: "trans_id_UNIQUE") @db.VarChar(25)
+  booking_id              String?  @db.VarChar(20)
+  content                 String   @db.VarChar(255)
+  type                    Boolean  @default(false)
+  amount                  Float    @db.Float
+  wallet                  Float?   @db.Float
+  solved                  Boolean  @default(false)
+  cancel                  Boolean  @default(false)
+  status                  Boolean  @default(false)
+  paid                    Boolean  @default(false)
+  bank_code               String?  @db.VarChar(20)
+  card_type               String?  @db.VarChar(20)
+  pay_date                String?  @db.VarChar(20)
+  currency_code           String?  @db.VarChar(3)
+  transaction_no          String?  @db.VarChar(25)
+  bank_transaction_no     String?  @db.VarChar(255)
+  payment_gateway         String?  @db.VarChar(15)
+  error_code              String?  @db.VarChar(10)
+  currency                String   @default("₫") @db.VarChar(5)
+  message                 String?  @db.VarChar(300)
+  ipAddr                  String?  @db.VarChar(45)
+  created_at              DateTime @default(now()) @db.Timestamp(0)
+  updated_at              DateTime @default(now()) @db.Timestamp(0)
+}
+
+model driver {
+  driver_id                  String                @id @db.VarChar(16)
+  office_id                  Int                   @default(8)
+  phone_number               String                @unique(map: "phone_number_UNIQUE") @db.VarChar(15)
+  password                   String                @db.VarChar(255)
+  full_name                  String                @db.VarChar(45)
+  birthday                   DateTime?             @db.Date
+  type                       Boolean               @default(false)
+  email                      String?               @db.VarChar(45)
+  email_verified             Boolean               @default(false)
+  gender                     Boolean               @default(true)
+  address                    String?               @db.VarChar(255)
+  avatar                     String?               @default("https://image.flaticon.com/icons/png/512/475/475223.png") @db.VarChar(500)
+  rating                     Float?                @default(5.00) @db.Float
+  facebook_id                String?               @db.VarChar(45)
+  google_id                  String?               @db.VarChar(45)
+  identification             String?               @db.VarChar(12)
+  id_img_front               String?               @db.VarChar(255)
+  id_img_back                String?               @db.VarChar(255)
+  invite_code                String?               @db.VarChar(15)
+  add_avatar                 String?               @db.VarChar(255)
+  invite_by                  String?               @db.VarChar(15)
+  status                     Boolean               @default(false)
+  is_online                  Boolean               @default(false)
+  activated                  Boolean
+  activated_qrpay            Boolean               @default(false)
+  verify_code                String                @db.VarChar(6)
+  verified                   Boolean               @default(false)
+  verify_count               Int                   @default(0)
+  last_login                 String?               @db.VarChar(15)
+  block                      Boolean               @default(false)
+  expiried_lock              DateTime?             @db.DateTime(0)
+  expiried_lock_partner      DateTime?             @db.DateTime(0)
+  login_status               Boolean               @default(false)
+  country_code               String                @default("+84") @db.VarChar(10)
+  app_code                   String?               @db.VarChar(10)
+  app_os                     Boolean               @default(false)
+  app_version                Int?
+  phone_name                 String?               @db.VarChar(225)
+  phone_os                   String?               @db.VarChar(45)
+  language                   String?               @default("vi") @db.VarChar(10)
+  device_token               String?               @db.VarChar(225)
+  region_name                String                @default("hanoi") @db.VarChar(45)
+  virtual_wallet             Float                 @default(0) @db.Float
+  real_wallet                Float                 @default(0) @db.Float
+  currency                   String                @default("₫") @db.VarChar(5)
+  is_taxi                    Boolean               @default(false)
+  register_by                Boolean               @default(true)
+  certificate_of_conduct_img String?               @db.VarChar(255)
+  curriculum_vitae_img_front String?               @db.VarChar(255)
+  curriculum_vitae_img_back  String?               @db.VarChar(255)
+  img_police_record          String?               @db.VarChar(225)
+  payment_list               String?               @db.VarChar(100)
+  app_list                   String?               @db.VarChar(45)
+  status_b                   Boolean               @default(false)
+  book_id                    String?               @db.VarChar(20)
+  vehicle_id                 Int?
+  driver_code                String?               @db.VarChar(45)
+  created_at                 DateTime              @default(now()) @db.Timestamp(0)
+  updated_at                 DateTime              @default(now()) @db.Timestamp(0)
+  is_econtract               Boolean               @default(false)
+  grp_id                     Int?
+  status_reservation         Boolean               @default(false)
+  reservation_id             String?               @db.VarChar(20)
+  active_point               Boolean               @default(false)
+  favorite_point             String?               @db.VarChar(250)
+  update_point               DateTime?             @db.DateTime(0)
+  type_lock                  Boolean?              @default(false)
+  last_lock                  Int?                  @db.UnsignedInt
+  office                     office                @relation(fields: [office_id], references: [office_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_driver_office")
+  black_list                 black_list[]
+  bookingOLD                 bookingOLD[]
+  customer_black_list        customer_black_list[]
+  driver_file                driver_file[]
+  driver_license             driver_license[]
+  driver_mission             driver_mission[]
+  driver_mistake             driver_mistake[]
+  driver_stat                driver_stat[]
+  driver_status              driver_status[]
+  driver_transaction         driver_transaction[]
+
+  @@index([office_id], map: "fk_driver_office_idx")
+}
+
+model driver_bill {
+  driver_bill_id BigInt   @id
+  driver_id      String   @db.VarChar(16)
+  content        String   @db.VarChar(255)
+  amount         Float    @db.Float
+  week           Int
+  year           Int
+  created_at     DateTime @default(now()) @db.Timestamp(0)
+}
+
+model driver_card {
+  id             Int      @id @default(autoincrement())
+  driver_id      String   @db.VarChar(15)
+  bank_id        Int
+  activated      Boolean  @default(true)
+  account_number String   @db.VarChar(15)
+  account_holder String   @db.VarChar(45)
+  created_at     DateTime @default(now()) @db.DateTime(0)
+}
+
+model driver_change {
+  id         Int      @id @default(autoincrement())
+  driver_id  String   @db.VarChar(16)
+  new_phone  String   @db.VarChar(15)
+  old_phone  String   @db.VarChar(15)
+  content    String   @db.VarChar(255)
+  created_at DateTime @default(now()) @db.Timestamp(0)
+
+  @@index([driver_id], map: "fk_dc_driver_idx")
+}
+
+model driver_file {
+  driver_file_id Int       @id @default(autoincrement()) @db.UnsignedInt
+  driver_id      String    @db.VarChar(16)
+  type           Boolean
+  status         Boolean
+  no             String?   @db.VarChar(20)
+  class          String?   @db.VarChar(5)
+  message        String?   @db.VarChar(250)
+  issued_by      String?   @db.VarChar(100)
+  img_front      String?   @db.VarChar(255)
+  img_back       String?   @db.VarChar(255)
+  date_of_issue  DateTime? @db.Date
+  expires        DateTime? @db.Date
+  created_at     DateTime  @default(now()) @db.Timestamp(0)
+  updated_at     DateTime  @default(now()) @db.Timestamp(0)
+  driver         driver    @relation(fields: [driver_id], references: [driver_id], onDelete: NoAction, map: "fk_df_driver")
+
+  @@index([driver_id], map: "fk_df_driver_idx")
+}
+
+model driver_group {
+  id         Int      @id @default(autoincrement())
+  office_id  Int
+  parent_id  Int?
+  name       String   @db.VarChar(45)
+  list       Json?
+  deleted    Boolean  @default(false)
+  created_at DateTime @default(now()) @db.Timestamp(0)
+  updated_at DateTime @default(now()) @db.Timestamp(0)
+}
+
+model driver_grp {
+  id         Int      @id @default(autoincrement())
+  office_id  Int
+  name       String   @db.VarChar(100)
+  user_list  String   @default("||") @db.VarChar(100)
+  created_at DateTime @default(now()) @db.DateTime(0)
+}
+
+model driver_license {
+  id              BigInt       @id @default(autoincrement())
+  driver_id       String       @db.VarChar(16)
+  vehicle_type_id Int
+  class           String       @db.VarChar(5)
+  img_front       String       @db.VarChar(225)
+  img_back        String       @db.VarChar(255)
+  expiration      DateTime?    @db.DateTime(0)
+  driver          driver       @relation(fields: [driver_id], references: [driver_id], onDelete: NoAction, map: "fk_dl_driver")
+  vehicle_type    vehicle_type @relation(fields: [vehicle_type_id], references: [vehicle_type_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_dl_vt")
+
+  @@index([driver_id], map: "fk_dl_driver_idx")
+  @@index([vehicle_type_id], map: "fk_dl_vt_idx")
+}
+
+model driver_lock {
+  driver_lock_id Int       @id @default(autoincrement())
+  driver_id      String    @db.VarChar(16)
+  content        String    @db.VarChar(500)
+  expiried_lock  DateTime? @db.DateTime(0)
+  created_at     DateTime  @default(now()) @db.Timestamp(0)
+}
+
+model driver_mission {
+  driver_id   String    @db.VarChar(16)
+  mission_id  Int
+  progress    Int
+  completed   Boolean
+  reward      Boolean
+  start_time  DateTime  @db.DateTime(0)
+  finish_time DateTime? @db.DateTime(0)
+  driver      driver    @relation(fields: [driver_id], references: [driver_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_dm_driver")
+  mission     mission   @relation(fields: [mission_id], references: [mission_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_dm_mission")
+
+  @@id([driver_id, mission_id])
+  @@index([mission_id], map: "fk_dm_mission_idx")
+}
+
+model driver_mistake {
+  driver_mistake_id BigInt   @id @default(autoincrement())
+  driver_id         String   @db.VarChar(16)
+  employee_id       Int?
+  description       String?  @db.VarChar(500)
+  booking_id        String?  @db.VarChar(20)
+  mistake_id        Int?
+  deleted           Boolean  @default(false)
+  created_at        DateTime @default(now()) @db.Timestamp(0)
+  driver            driver   @relation(fields: [driver_id], references: [driver_id], onDelete: NoAction, map: "fk_dmd")
+  mistake           mistake? @relation(fields: [mistake_id], references: [mistake_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_driver_m_mistake")
+
+  @@index([driver_id], map: "fk_dmd_idx")
+  @@index([mistake_id], map: "fk_driver_m_mistake_idx")
+}
+
+model driver_news {
+  id          Int      @id @default(autoincrement())
+  title       String   @db.VarChar(45)
+  body        String   @db.Text
+  type        Int      @db.TinyInt
+  image       String?  @db.VarChar(225)
+  detail_link String?  @db.VarChar(225)
+  created_at  DateTime @default(now()) @db.Timestamp(0)
+}
+
+model driver_punish {
+  id          Int      @id @default(autoincrement())
+  office_id   Int
+  type        Boolean  @default(false)
+  is_taxi     Boolean  @default(false)
+  rate        Float?   @db.Float
+  trip_number Boolean
+  days        Boolean  @default(false)
+  hours       Boolean  @default(false)
+  percent     Float    @db.Float
+  list_group  String?  @db.VarChar(200)
+  deleted     Boolean  @default(false)
+  created_at  DateTime @default(now()) @db.Timestamp(0)
+  update_at   DateTime @default(now()) @db.Timestamp(0)
+  minutes     Int      @default(0)
+}
+
+model driver_stat {
+  driver_id      String @db.VarChar(16)
+  week           Int    @db.SmallInt
+  year           Int    @db.SmallInt
+  accept_percent Float  @default(100.0) @db.Float
+  cancel_percent Float  @default(0.0) @db.Float
+  driver         driver @relation(fields: [driver_id], references: [driver_id], onDelete: NoAction, map: "fk_ds_driver")
+
+  @@id([driver_id, week, year])
+}
+
+model driver_status {
+  driver_id    String                @db.VarChar(16)
+  service_id   Int
+  vehicle_id   Int
+  status       Int
+  cur_location Unsupported("point")
+  pre_location Unsupported("point")?
+  orientation  Float                 @default(0) @db.Float
+  driver       driver                @relation(fields: [driver_id], references: [driver_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_driver_status_driver")
+  service      service               @relation(fields: [service_id], references: [service_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_driver_status_service")
+  vehicle      vehicle               @relation(fields: [vehicle_id], references: [vehicle_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_driver_status_vehicle")
+
+  @@id([driver_id, service_id])
+  @@index([service_id], map: "fk_driver_status_service_idx")
+  @@index([vehicle_id], map: "fk_driver_status_vehicle_idx")
+}
+
+model driver_transaction {
+  driver_transaction_id String   @id @db.VarChar(14)
+  driver_id             String   @db.VarChar(16)
+  trans_id              String?  @db.VarChar(25)
+  user_id               Int?
+  booking_id            String?  @db.VarChar(20)
+  content               String   @db.VarChar(255)
+  code                  String?  @db.VarChar(10)
+  bank_code             String?  @db.VarChar(20)
+  cancel                Boolean  @default(false)
+  amount                Float    @db.Float
+  virtual_wallet        Float?   @db.Float
+  real_wallet           Float?   @db.Float
+  type                  Boolean  @default(true)
+  solved                Boolean  @default(false)
+  currency              String   @default("₫") @db.VarChar(5)
+  status                Boolean  @default(false)
+  paid                  Boolean  @default(false)
+  card_type             String?  @db.VarChar(20)
+  pay_date              String?  @db.VarChar(20)
+  currency_code         String?  @db.VarChar(3)
+  qr_trace              String?  @db.VarChar(45)
+  transaction_no        String?  @db.VarChar(25)
+  error_code            String?  @db.VarChar(10)
+  bank_transaction_no   String?  @db.VarChar(255)
+  account_no            String?  @db.VarChar(45)
+  payment_gateway       String?  @db.VarChar(15)
+  message               String?  @db.VarChar(300)
+  ipAddr                String?  @db.VarChar(45)
+  created_at            DateTime @default(now()) @db.Timestamp(0)
+  updated_at            DateTime @default(now()) @db.Timestamp(0)
+  driver                driver   @relation(fields: [driver_id], references: [driver_id], onDelete: NoAction, map: "fk_dt_driver")
+  user                  user?    @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_dt_user")
+
+  @@index([booking_id], map: "fk_dt_booking")
+  @@index([driver_id], map: "fk_dt_driver_idx")
+  @@index([user_id], map: "fk_dt_user_idx")
+}
+
+model driver_vehicle {
+  driver_vehicle_id Int      @id @default(autoincrement())
+  driver_id         String   @db.VarChar(16)
+  vehicle_id        Int
+  service_id        Int
+  code              String?  @default("||") @db.VarChar(100)
+  available         Boolean  @default(true)
+  created_at        DateTime @default(now()) @db.Timestamp(0)
+  service           service  @relation(fields: [service_id], references: [service_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_dv_service")
+  vehicle           vehicle  @relation(fields: [vehicle_id], references: [vehicle_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_dv_vehicle")
+
+  @@index([service_id], map: "fk_dv_service_idx")
+  @@index([vehicle_id], map: "fk_dv_vehicle_idx")
+}
+
+model email_temp {
+  id         Int      @id @default(autoincrement())
+  email      String   @db.VarChar(255)
+  body       Json?
+  created_at DateTime @default(now()) @db.Timestamp(0)
+}
+
+model feedback {
+  feedback_id  BigInt   @id @default(autoincrement())
+  booking_id   String   @db.VarChar(20)
+  user_id      Int?
+  other_report String?  @db.VarChar(500)
+  report_id    Int?
+  type         Int      @default(1)
+  solved       Boolean? @default(false)
+  deleted      Boolean? @default(false)
+  created_at   DateTime @default(now()) @db.Timestamp(0)
+  report       report?  @relation(fields: [report_id], references: [report_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_feedback_report")
+
+  @@index([report_id], map: "fk_feedback_report_idx")
+}
+
+model firebase_otp_missing {
+  id          BigInt  @id @default(autoincrement()) @db.UnsignedBigInt
+  os          String? @db.VarChar(100)
+  os_version  String? @db.VarChar(100)
+  device_name String? @db.VarChar(100)
+  ip          String? @db.VarChar(100)
+  location    String? @db.VarChar(100)
+}
+
+model group_marketing {
+  id         Int      @id @default(autoincrement())
+  office_id  Int
+  name       String   @db.VarChar(100)
+  value      Float    @db.Float
+  deleted    Boolean  @default(false)
+  created_at DateTime @default(now()) @db.Timestamp(0)
+}
+
+model group_service {
+  group_service_id     Int                    @id @unique(map: "group_service_id_UNIQUE") @default(autoincrement())
+  office_id            Int
+  region_id            Int                    @default(2)
+  check_region         Boolean                @default(false)
+  vi_name              String                 @db.VarChar(225)
+  en_name              String                 @db.VarChar(225)
+  lo_name              String                 @default("a") @db.VarChar(255)
+  parent               Boolean                @default(true)
+  available            Boolean                @default(true)
+  locked               Boolean                @default(false)
+  host                 String?                @db.VarChar(45)
+  host_https           String?                @db.VarChar(45)
+  radius_search        Float                  @default(10000) @db.Float
+  description          String                 @db.VarChar(500)
+  logo                 String                 @db.VarChar(225)
+  logo_selected        String                 @db.VarChar(225)
+  gg_key               String                 @default("AIzaSyBea9yjUjXSsaWecn3Bb8WSxTkckyV0UbI") @db.VarChar(100)
+  c_key                String                 @default("a12d#@3007") @db.VarChar(35)
+  type                 Boolean                @default(false)
+  public               Boolean                @default(false)
+  iorder               Int                    @default(0)
+  iorderb              Boolean                @default(false)
+  created_at           DateTime               @default(now()) @db.Timestamp(0)
+  updated_at           DateTime               @default(now()) @db.Timestamp(0)
+  office               office                 @relation(fields: [office_id], references: [office_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_gs_office")
+  region               region                 @relation(fields: [region_id], references: [region_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_gs_region")
+  group_service_region group_service_region[]
+  service              service[]
+
+  @@index([office_id], map: "fk_gs_office_idx")
+  @@index([region_id], map: "fk_gs_region_idx")
+}
+
+model group_service_region {
+  id               BigInt        @id @default(autoincrement()) @db.UnsignedBigInt
+  group_service_id Int
+  polygon          Json?
+  group_service    group_service @relation(fields: [group_service_id], references: [group_service_id], onUpdate: Restrict, map: "group_service_region_FK")
+
+  @@index([group_service_id], map: "group_service_region_FK")
+}
+
+model journey_info {
+  journey_info_id     BigInt                @id @default(autoincrement()) @db.UnsignedBigInt
+  booking_id          String                @unique(map: "booking_id_UNIQUE") @db.VarChar(20)
+  status              Boolean               @default(false)
+  start_address       String?               @db.VarChar(500)
+  end_address         String?               @db.VarChar(500)
+  start_point         Unsupported("point")?
+  end_point           Unsupported("point")?
+  waypoints           Json?
+  start_time          DateTime              @db.DateTime(0)
+  finish_time         DateTime?             @db.DateTime(0)
+  distance            Float?                @default(0.000) @db.Float
+  rate                Boolean?
+  comment             String?               @db.VarChar(255)
+  driver_rate         Boolean?
+  driver_comment      String?               @db.VarChar(255)
+  total_price         Float?                @db.Float
+  round_price         Int                   @default(0)
+  bonus               Float                 @default(0) @db.Float
+  discount            Float                 @default(0) @db.Float
+  surcharge           Float                 @default(0) @db.Float
+  tip                 Float                 @default(0) @db.Float
+  brokerage_fee       Float?                @db.Float
+  paid                Boolean               @default(false)
+  recharge            Boolean               @default(true)
+  call_payment        Boolean               @default(false)
+  time_change_payment DateTime?             @db.DateTime(0)
+  payment_gateway     String?               @db.VarChar(15)
+  reference_id        String?               @unique(map: "reference_id_UNIQUE") @db.VarChar(45)
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model machine {
+  machine_id String @db.VarChar(100)
+  user_id    Int
+  unixtime   Int
+
+  @@ignore
+}
+
+model maintenance {
+  maintenance_id Int      @id @default(autoincrement())
+  content        String   @db.VarChar(255)
+  type           Int      @default(0)
+  status         Boolean  @default(true)
+  from_date      DateTime @db.DateTime(0)
+  to_date        DateTime @db.DateTime(0)
+}
+
+model marketing {
+  id             Int        @id @default(autoincrement())
+  office_id      Int
+  name           String     @db.VarChar(45)
+  mid            String?    @db.VarChar(45)
+  address        String     @db.VarChar(255)
+  type           Boolean    @default(false)
+  region_id      Int?
+  location       String?    @db.VarChar(45)
+  bank_name      String?    @db.VarChar(255)
+  bank_branch    String?    @db.VarChar(255)
+  card_holder    String?    @db.VarChar(45)
+  account_number String?    @db.VarChar(20)
+  deleted        Boolean?   @default(false)
+  created_at     DateTime   @default(now()) @db.Timestamp(0)
+  customer       customer[]
+}
+
+model marketing_phone {
+  marketing_phone_id Int    @id @default(autoincrement())
+  marketing_id       Int
+  customer_id        String @db.VarChar(16)
+}
+
+model marketing_rg {
+  marketing_id Int
+  region_id    Int
+  mname        String? @db.VarChar(45)
+
+  @@id([marketing_id, region_id])
+}
+
+model merged_region {
+  id                                       Int                  @id @default(autoincrement())
+  region_id                                Int
+  main_region                              Int
+  status                                   merged_region_status @default(active)
+  region_merged_region_region_idToregion   region               @relation("merged_region_region_idToregion", fields: [region_id], references: [region_id], onUpdate: Restrict, map: "merged_region_FK")
+  region_merged_region_main_regionToregion region               @relation("merged_region_main_regionToregion", fields: [main_region], references: [region_id], onUpdate: Restrict, map: "merged_region_FK_1")
+
+  @@index([region_id], map: "merged_region_FK")
+  @@index([main_region], map: "merged_region_FK_1")
+}
+
+model message {
+  message_id  BigInt   @id
+  customer_id String   @db.VarChar(16)
+  content     String   @db.VarChar(500)
+  send_status Boolean
+  open_status Boolean
+  customer    customer @relation(fields: [customer_id], references: [customer_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_messages_customers")
+
+  @@index([customer_id], map: "fk_messages_customers_idx")
+}
+
+model mission {
+  mission_id     Int              @id @default(autoincrement())
+  name           String           @db.VarChar(45)
+  body           String           @db.Text
+  prize          String           @db.VarChar(100)
+  parent         Int?
+  type           Int
+  is_share       Boolean
+  list_service   String?          @db.VarChar(100)
+  goal           Int
+  value          Float?           @db.Float
+  start_time     DateTime?        @db.Date
+  end_time       DateTime?        @db.DateTime(0)
+  duration       String?          @db.VarChar(100)
+  created_at     DateTime         @default(now()) @db.Timestamp(0)
+  driver_mission driver_mission[]
+}
+
+model mistake {
+  mistake_id     Int              @id @default(autoincrement())
+  content        String           @db.VarChar(255)
+  vi_name        String           @db.VarChar(255)
+  en_name        String           @db.VarChar(255)
+  lo_name        String           @default("a") @db.VarChar(255)
+  driver_mistake driver_mistake[]
+}
+
+model module {
+  module_id  Int      @id @default(autoincrement())
+  name       String   @db.VarChar(225)
+  parent_id  Int
+  path_run   String   @db.VarChar(256)
+  icon       String   @db.VarChar(256)
+  metro_img  String   @db.VarChar(256)
+  background String   @db.VarChar(256)
+  double     Boolean
+  iorder     Int
+  type       Boolean
+  active     Int      @default(1) @db.TinyInt
+  created_at DateTime @default(now()) @db.Timestamp(0)
+  updated_at DateTime @default(now()) @db.Timestamp(0)
+}
+
+model multiregion {
+  id                Int @id
+  region_id         Int
+  primary_region_id Int
+
+  @@index([region_id, primary_region_id], map: "id_UNIQUE")
+}
+
+model news {
+  id          Int      @id @default(autoincrement())
+  office_id   Int      @default(1)
+  app_os      String   @default("0") @db.VarChar(10)
+  title       String   @db.VarChar(225)
+  body        String   @db.Text
+  user_type   Int      @db.TinyInt
+  deleted     Boolean  @default(false)
+  type        Int      @db.TinyInt
+  image       String?  @db.VarChar(225)
+  detail_link String?  @db.VarChar(225)
+  created_at  DateTime @default(now()) @db.Timestamp(0)
+
+  @@index([office_id], map: "fk_news_office_idx")
+}
+
+model office {
+  office_id                 Int              @id @default(autoincrement())
+  region_id                 Int?
+  name                      String           @db.VarChar(255)
+  brand                     String?          @db.VarChar(45)
+  code                      String?          @db.VarChar(10)
+  app_code                  String?          @db.VarChar(10)
+  tran_code                 String?          @unique(map: "tran_code_UNIQUE") @db.VarChar(2)
+  calling_code              String?          @db.VarChar(5)
+  type                      Boolean          @default(true)
+  parent_id                 Int              @default(0)
+  telephone                 String           @default("0") @db.VarChar(15)
+  mobile_phone              String           @default("0") @db.VarChar(15)
+  host                      String?          @db.VarChar(45)
+  fax                       String           @default("0") @db.VarChar(45)
+  email                     String?          @db.VarChar(45)
+  locked                    Boolean          @default(false)
+  list_role                 String?          @db.VarChar(10000)
+  level                     Int              @default(2) @db.TinyInt
+  iorder                    Int              @default(0)
+  room                      String?          @db.VarChar(45)
+  min_amount_virtual_wallet Float            @default(100000) @db.Float
+  max_amount_virtual_wallet Float            @default(1000000) @db.Float
+  min_amount_real_wallet    Float            @default(100000) @db.Float
+  max_amount_real_wallet    Float            @default(1000000) @db.Float
+  credit_line               Float            @default(5000000) @db.Float
+  currency                  String           @default("₫") @db.VarChar(5)
+  payment_list              String?          @db.VarChar(45)
+  app_list                  String?          @db.VarChar(45)
+  created_at                DateTime         @default(now()) @db.Timestamp(0)
+  updated_at                DateTime         @default(now()) @db.Timestamp(0)
+  tax_number                String?          @db.VarChar(20)
+  econtract_phone           String?          @db.VarChar(15)
+  econtract_email           String?          @db.VarChar(45)
+  address                   String?          @db.VarChar(245)
+  region                    region?          @relation(fields: [region_id], references: [region_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_office_region")
+  customer                  customer[]
+  driver                    driver[]
+  group_service             group_service[]
+  office_service            office_service[]
+  promotion                 promotion[]
+  role_group                role_group[]
+  user                      user[]
+  vehicle                   vehicle[]
+
+  @@index([region_id], map: "fk_office_region_idx")
+}
+
+model office_new {
+  id         Int      @id @default(autoincrement())
+  office_id  Int
+  title      String   @db.VarChar(500)
+  sub_body   String?  @db.Text
+  type       Boolean
+  url        String?  @db.VarChar(500)
+  body       String?  @db.Text
+  image      String   @db.VarChar(500)
+  deleted    Boolean  @default(false)
+  created_at DateTime @default(now()) @db.Timestamp(0)
+}
+
+model office_service {
+  office_id  Int
+  service_id Int
+  type       Int      @default(0) @db.TinyInt
+  created_at DateTime @default(now()) @db.Timestamp(0)
+  updated_at DateTime @default(now()) @db.Timestamp(0)
+  office     office   @relation(fields: [office_id], references: [office_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_os_office")
+  service    service  @relation(fields: [service_id], references: [service_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_os_service")
+
+  @@id([office_id, service_id, type])
+  @@index([service_id], map: "fk_ds_service_idx")
+}
+
+model otp {
+  id           BigInt     @id @default(autoincrement()) @db.UnsignedBigInt
+  phone_number String     @db.VarChar(20)
+  otp          String     @db.VarChar(10)
+  status       otp_status @default(created)
+  timestamp    Json?
+  retry        Int        @default(0) @db.UnsignedTinyInt
+  created_at   BigInt     @db.UnsignedBigInt
+  solved_at    BigInt?    @db.UnsignedBigInt
+
+  @@index([created_at], map: "otp_created_at_IDX")
+}
+
+model payment {
+  payment_id  Int         @id
+  name        String      @db.VarChar(45)
+  code        String?     @db.VarChar(100)
+  app         String?     @db.VarChar(100)
+  type        Int
+  description String?     @db.Text
+  icon        String?     @db.Text
+  available   Int?        @db.TinyInt
+  promotion   promotion[]
+}
+
+model poi {
+  id       Int                  @id @default(autoincrement()) @db.UnsignedInt
+  name     String?              @db.VarChar(40)
+  type     String?              @db.VarChar(20)
+  sub_type String?              @db.VarChar(20)
+  pt       Unsupported("point")
+
+  @@index([pt(length: 32)], map: "pt")
+}
+
+model price {
+  price_id         Int          @id @default(autoincrement())
+  service_id       Int
+  type             Boolean      @default(false)
+  available        Boolean      @default(true)
+  price_per_km     Float        @db.Float
+  opening_distance Float        @default(2) @db.Float
+  opening_price    Float        @db.Float
+  price_per_minute Float        @default(0) @db.Float
+  price_over       String?      @db.VarChar(100)
+  waiting_time     Float        @default(0) @db.Float
+  days             Json?
+  duration         Json?
+  currency         String       @default("₫") @db.VarChar(5)
+  created_at       DateTime     @default(now()) @db.Timestamp(0)
+  updated_at       DateTime     @default(now()) @db.Timestamp(0)
+  reach_speed      Float        @default(0) @db.Float
+  reach_time       Int          @default(0)
+  reach_price      Int          @default(0)
+  service          service      @relation(fields: [service_id], references: [service_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_price_service")
+  bookingOLD       bookingOLD[]
+
+  @@index([service_id], map: "fk_price_service_idx")
+}
+
+model priority {
+  priority_id     Int          @id
+  priority_detail String       @db.VarChar(50)
+  bookingOLD      bookingOLD[]
+}
+
+model promotion {
+  promotion_id        BigInt               @id @default(autoincrement())
+  service_id          Int                  @default(1)
+  office_id           Int                  @default(2)
+  region_id           Int                  @default(2)
+  list_service        Json?
+  payment_id          Int?
+  list_payment        Json?
+  app_list            String?              @db.VarChar(45)
+  name                String               @db.VarChar(255)
+  list_customer_group Json?
+  list_group          String?              @db.VarChar(255)
+  body                String               @db.Text
+  content             String               @default("Khuyến mãi") @db.VarChar(500)
+  promotion_code      String               @db.VarChar(15)
+  start_time          DateTime?            @db.Date
+  end_time            DateTime?            @db.Date
+  new_version         Boolean              @default(false)
+  startTime           DateTime?            @db.DateTime(0)
+  endTime             DateTime?            @db.DateTime(0)
+  type                Int
+  available           Boolean              @default(true)
+  value               Float                @db.Float
+  quantity            Int?                 @default(-1)
+  remaining_quantity  Int?
+  max_discount        Int?
+  max_total_trip      Int                  @default(5)
+  max_trip            Int
+  apply_type          Boolean              @default(false)
+  apply_for           Boolean              @default(false)
+  apply_from_trip     Boolean
+  apply_for_new       Boolean              @default(false)
+  above_amount        Float                @default(0) @db.Float
+  duration            Json?
+  region              String?              @default("Hà Nội") @db.VarChar(45)
+  img_banner          String?              @default("http://thoibaonganhang.vn/stores/news_dataimages/thanhlm/042017/08/11/cd9d601ed036b05d8c09b489dc72ac39_Screen-Shot-2016-08-28-at-12.47.31-AM.jpg") @db.VarChar(255)
+  image               String?              @db.VarChar(255)
+  deleted             Boolean              @default(false)
+  is_public           Boolean              @default(false)
+  otType              Boolean              @default(false)
+  register_from       DateTime?            @db.DateTime(0)
+  created_at          DateTime             @default(now()) @db.Timestamp(0)
+  updated_at          DateTime             @default(now()) @db.Timestamp(0)
+  office              office               @relation(fields: [office_id], references: [office_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_promotion_office")
+  payment             payment?             @relation(fields: [payment_id], references: [payment_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_promotion_payment")
+  service             service              @relation(fields: [service_id], references: [service_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_promotion_service")
+  promotion_customer  promotion_customer[]
+
+  @@index([office_id], map: "fk_promotion_office_idx")
+  @@index([payment_id], map: "fk_promotion_payment_idx")
+  @@index([service_id], map: "fk_promotion_service_idx")
+}
+
+model promotion_customer {
+  id           BigInt    @id @default(autoincrement())
+  promotion_id BigInt
+  customer_id  String    @db.VarChar(16)
+  date         DateTime  @db.DateTime(0)
+  available    Boolean
+  trip_number  Boolean
+  customer     customer  @relation(fields: [customer_id], references: [customer_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_pc_customer")
+  promotion    promotion @relation(fields: [promotion_id], references: [promotion_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_pc_promotion")
+
+  @@index([promotion_id], map: "fk_pc_promotion_idx")
+  @@index([customer_id], map: "fk_promotion_user_user_idx")
+}
+
+model ratio {
+  ratio_id Int    @id @default(autoincrement())
+  vi_name  String @db.VarChar(225)
+  en_name  String @db.VarChar(225)
+  value    Float  @db.Float
+}
+
+model realtime {
+  realtime_id BigInt  @id @default(autoincrement())
+  user_id     String  @db.VarChar(45)
+  machine_id  String  @db.VarChar(45)
+  content     String? @db.VarChar(225)
+}
+
+model reason {
+  reason_id  Int          @id @default(autoincrement())
+  vi_name    String       @db.VarChar(225)
+  en_name    String       @db.VarChar(225)
+  lo_name    String       @default("a") @db.VarChar(255)
+  type       Boolean      @default(false)
+  user_type  Boolean      @default(false)
+  deleted    Boolean      @default(false)
+  iorder     Boolean      @default(false)
+  created_at DateTime     @default(now()) @db.Timestamp(0)
+  updated_at DateTime     @default(now()) @db.Timestamp(0)
+  bookingOLD bookingOLD[]
+}
+
+model region {
+  region_id                                       Int                     @id @default(autoincrement())
+  name                                            String                  @unique(map: "name_UNIQUE") @db.VarChar(45)
+  code                                            String                  @unique(map: "region_code_UNIQUE") @db.VarChar(10)
+  boundary                                        Unsupported("polygon")?
+  call_name                                       String                  @db.VarChar(100)
+  available                                       Boolean                 @default(true)
+  group_service                                   group_service[]
+  merged_region_merged_region_region_idToregion   merged_region[]         @relation("merged_region_region_idToregion")
+  merged_region_merged_region_main_regionToregion merged_region[]         @relation("merged_region_main_regionToregion")
+  office                                          office[]
+}
+
+model report {
+  report_id  Int        @id @default(autoincrement())
+  vi_content String     @db.VarChar(225)
+  en_content String     @db.VarChar(225)
+  lo_name    String     @default("a") @db.VarChar(255)
+  user_type  Boolean    @default(true)
+  deleted    Boolean    @default(false)
+  feedback   feedback[]
+}
+
+model retirement {
+  retirement_id Int      @id @default(autoincrement())
+  user_id       Int
+  from_date     DateTime @default(now()) @db.Timestamp(0)
+  replacer      Int?
+}
+
+model role {
+  role_id    Int      @id @default(autoincrement())
+  module_id  Int
+  name       String   @db.VarChar(225)
+  type       Boolean  @default(true)
+  iorder     Int      @default(0)
+  created_at DateTime @default(now()) @db.Timestamp(0)
+  updated_at DateTime @default(now()) @db.Timestamp(0)
+}
+
+model role_group {
+  role_group_id Int    @id @default(autoincrement())
+  office_id     Int
+  name          String @db.VarChar(225)
+  list_user     String @db.VarChar(10000)
+  list_role     String @db.VarChar(4000)
+  list_module   String @db.VarChar(4000)
+  office        office @relation(fields: [office_id], references: [office_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_rg_office")
+
+  @@index([office_id], map: "fk_rg_department_idx")
+}
+
+model send_email {
+  id         Int       @id @default(autoincrement())
+  type       Int
+  email      String    @db.VarChar(100)
+  status     Int
+  body       Json
+  sent_date  DateTime? @db.DateTime(0)
+  created_at DateTime  @default(now()) @db.Timestamp(0)
+}
+
+model send_notify {
+  id           Int       @id @default(autoincrement())
+  type         Int
+  device_token String    @db.VarChar(225)
+  status       Int
+  body         Json
+  sent_date    DateTime? @db.DateTime(0)
+  created_at   DateTime  @default(now()) @db.Timestamp(0)
+}
+
+model service {
+  service_id           Int                   @id @default(autoincrement())
+  group_service_id     Int
+  vehicle_type_id      Int
+  list_payment         Json?
+  parent               Int                   @default(0)
+  type                 Int                   @default(1)
+  type_charged         Int                   @default(1) @db.TinyInt
+  type_direct          Boolean               @default(false)
+  body                 String?               @db.Text
+  vi_short_description String?               @db.VarChar(150)
+  en_short_description String?               @db.VarChar(150)
+  lo_short_description String?               @db.VarChar(150)
+  vi_description       String?               @db.VarChar(1500)
+  en_description       String?               @db.VarChar(1455)
+  lo_description       String?               @db.VarChar(1455)
+  display              Boolean               @default(true)
+  telephone            String                @db.VarChar(15)
+  email                String                @db.VarChar(45)
+  en_name              String                @db.VarChar(225)
+  vi_name              String                @db.VarChar(225)
+  lo_name              String                @default("a") @db.VarChar(255)
+  available            Boolean               @default(true)
+  on_app               Boolean               @default(true)
+  on_super             Boolean               @default(false)
+  is_fixed             Boolean               @default(false)
+  iorder               Int                   @default(0)
+  add_service          String?               @default("||") @db.VarChar(100)
+  grp                  Int?
+  grp_type             Boolean               @default(false)
+  max_distance         Float                 @db.Float
+  grp_service          String?               @db.VarChar(45)
+  amplitude            Int                   @default(0)
+  radius_search        Int
+  app_radius_search    Int                   @default(0)
+  discount_journey     Float                 @default(0.1) @db.Float
+  bonus_journey        Float                 @default(0) @db.Float
+  add_discount         Json?
+  keep_online          Boolean               @default(false)
+  need_endpoint        Boolean               @default(true)
+  meter_switch         Boolean               @default(false)
+  change_service       Boolean               @default(false)
+  allow_coordinator    Boolean               @default(false)
+  region_center        Unsupported("point")?
+  draw_away            Boolean               @default(true)
+  draw_away_journey    Boolean               @default(false)
+  free_trip            Boolean               @default(false)
+  refuse_booking       Boolean               @default(false)
+  img_marker           String                @db.VarChar(225)
+  img_service          String                @db.VarChar(225)
+  img_selected         String                @db.VarChar(225)
+  img_tab              String                @db.VarChar(225)
+  center_lat           String                @default("21.036809") @db.VarChar(15)
+  center_lng           String                @default("105.782771") @db.VarChar(15)
+  currency             String                @default("₫") @db.VarChar(5)
+  distance_start       Int                   @default(0)
+  app_list             String                @default("|EMDDI|") @db.VarChar(45)
+  created_at           DateTime              @default(now()) @db.Timestamp(0)
+  updated_at           DateTime              @default(now()) @db.Timestamp(0)
+  service_type         service_service_type? @default(other)
+  group_service        group_service         @relation(fields: [group_service_id], references: [group_service_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_service_gs")
+  vehicle_type         vehicle_type          @relation(fields: [vehicle_type_id], references: [vehicle_type_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_service_vt")
+  driver_status        driver_status[]
+  driver_vehicle       driver_vehicle[]
+  office_service       office_service[]
+  price                price[]
+  promotion            promotion[]
+
+  @@index([group_service_id], map: "fk_service_type_service_idx")
+  @@index([vehicle_type_id], map: "fk_service_vt_idx")
+}
+
+model status {
+  status_id       Int     @id
+  journey_info_id BigInt
+  waitting_status Boolean
+}
+
+model system_error {
+  id          Int       @id @default(autoincrement())
+  description String?   @db.VarChar(255)
+  solved      Boolean   @default(false)
+  created_at  DateTime  @default(now()) @db.Timestamp(0)
+  date_solve  DateTime? @db.DateTime(0)
+}
+
+model system_log {
+  system_log_id BigInt   @id @default(autoincrement())
+  user_id       Int?
+  user_name     String?  @db.VarChar(45)
+  full_name     String?  @db.VarChar(50)
+  content       String?  @db.VarChar(45)
+  client_ip     String   @db.VarChar(100)
+  browser_name  String   @db.VarChar(100)
+  created_at    DateTime @default(now()) @db.Timestamp(0)
+  user          user?    @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_sl_user")
+
+  @@index([user_id], map: "fk_sl_user_idx")
+}
+
+model tbl_lock {
+  id   Int     @id
+  name String? @db.VarChar(45)
+}
+
+model terms {
+  id           Int      @id @default(autoincrement())
+  type         Int
+  body         String   @db.LongText
+  link_policy  String   @db.VarChar(255)
+  link_privacy String   @db.VarChar(255)
+  link_support String   @db.VarChar(255)
+  created_at   DateTime @default(now()) @db.Timestamp(0)
+  updated_at   DateTime @default(now()) @db.Timestamp(0)
+}
+
+model test {
+  id         Int                   @id @default(autoincrement())
+  name       String                @db.VarChar(50)
+  cor        Unsupported("point")?
+  date       Float?                @db.Float
+  list       Json?
+  num        Int?
+  created_at DateTime              @default(now()) @db.Timestamp(0)
+}
+
+model user {
+  user_id            Int                  @id @default(autoincrement())
+  office_id          Int
+  unit_id            Int                  @default(1)
+  represent          Int                  @default(1)
+  full_name          String               @db.VarChar(50)
+  phone_number       String               @db.VarChar(45)
+  user_name          String               @db.VarChar(45)
+  password           String               @db.VarChar(225)
+  email              String?              @db.VarChar(45)
+  birthday           DateTime?            @db.Date
+  avatar             String               @db.VarChar(225)
+  address            String?              @db.VarChar(225)
+  sex                Boolean              @default(false)
+  level              Int                  @default(0)
+  list_role          String               @db.VarChar(5000)
+  list_module        String               @db.VarChar(5000)
+  iorder             Int                  @default(0)
+  locked             Int                  @default(0) @db.TinyInt
+  status             Int                  @default(0) @db.TinyInt
+  is_online          Int                  @default(0) @db.TinyInt
+  limit_date         Int                  @default(90)
+  center_lat         String?              @db.VarChar(45)
+  center_lng         String?              @db.VarChar(45)
+  mac_address        String?              @db.VarChar(256)
+  created_at         DateTime             @default(now()) @db.Timestamp(0)
+  updated_at         DateTime             @default(now()) @db.Timestamp(0)
+  office             office               @relation(fields: [office_id], references: [office_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_employee_office")
+  driver_transaction driver_transaction[]
+  system_log         system_log[]
+  user_note          user_note[]
+  user_service       user_service?
+
+  @@index([office_id], map: "fk_employee_department_idx")
+}
+
+model user_device_token {
+  id           Int      @id @default(autoincrement())
+  device_id    String   @db.VarChar(45)
+  user_id      String   @db.VarChar(16)
+  device_token String   @db.VarChar(255)
+  user_type    Int?
+  customer     customer @relation(fields: [user_id], references: [customer_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_user_device_tokens_user")
+
+  @@index([user_id], map: "fk_user_device_tokens_user_idx")
+}
+
+model user_note {
+  id         Int       @id @default(autoincrement())
+  user_id    Int
+  content    String    @db.VarChar(500)
+  checked    Boolean   @default(false)
+  deleted    Boolean   @default(false)
+  expires    DateTime? @db.Date
+  created_at DateTime  @default(now()) @db.Timestamp(0)
+  update_at  DateTime  @default(now()) @db.Timestamp(0)
+  user       user      @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_note_user")
+
+  @@index([user_id], map: "fk_note_user_idx")
+}
+
+model user_service {
+  user_id           Int      @id
+  list_service      Json?
+  x                 String?  @db.VarChar(45)
+  y                 String?  @db.VarChar(45)
+  switchboard       Int?     @db.SmallInt
+  grant_coordinator Boolean  @default(false)
+  region_id         Int?
+  created_at        DateTime @default(now()) @db.Timestamp(0)
+  settings          String?  @db.VarChar(1500)
+  user              user     @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_us_user")
+}
+
+model vehicle {
+  vehicle_id                Int              @id @default(autoincrement())
+  vehicle_model_id          Int
+  office_id                 Int              @default(8)
+  service_id                Int?
+  license_plate             String           @unique(map: "license_plate_UNIQUE") @db.VarChar(15)
+  vi_color                  String           @db.VarChar(10)
+  en_color                  String           @db.VarChar(10)
+  lo_color                  String?          @db.VarChar(10)
+  available                 Boolean          @default(true)
+  checked                   Boolean          @default(false)
+  code                      String?          @db.VarChar(15)
+  bluetooth_address         String?          @db.VarChar(100)
+  bluetooth_password        String?          @db.VarChar(25)
+  img_registration          String?          @db.VarChar(225)
+  expiration_insurrance     DateTime?        @db.Date
+  img_insurance             String?          @db.VarChar(225)
+  img_control_registrantion String?          @db.VarChar(45)
+  expiration_cr             String?          @db.VarChar(45)
+  manufacturing_year        Int?
+  driver_grp_id             Int?
+  driver_list               String           @default("||") @db.VarChar(100)
+  is_public                 Boolean          @default(true)
+  office                    office           @relation(fields: [office_id], references: [office_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_vehicle_office")
+  vehicle_model             vehicle_model    @relation(fields: [vehicle_model_id], references: [vehicle_model_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_vehicle_vm")
+  bookingOLD                bookingOLD[]
+  driver_status             driver_status[]
+  driver_vehicle            driver_vehicle[]
+  vehicle_file              vehicle_file[]
+
+  @@index([office_id], map: "fk_vehicle_office_idx")
+  @@index([vehicle_model_id], map: "fk_vehicle_vm_idx")
+}
+
+model vehicle_brand {
+  vehicle_brand_id Int             @id @default(autoincrement())
+  vehicle_type_id  Int
+  name             String          @db.VarChar(45)
+  vehicle_type     vehicle_type    @relation(fields: [vehicle_type_id], references: [vehicle_type_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_vb_vt")
+  vehicle_model    vehicle_model[]
+
+  @@index([vehicle_type_id], map: "fk_vb_vt_idx")
+}
+
+model vehicle_file {
+  vehicle_file_id Int       @id @default(autoincrement()) @db.UnsignedInt
+  vehicle_id      Int
+  type            Boolean
+  status          Boolean
+  message         String?   @db.VarChar(250)
+  no              String?   @db.VarChar(20)
+  img_front       String?   @db.VarChar(255)
+  img_back        String?   @db.VarChar(255)
+  date_of_issue   DateTime? @db.Date
+  expires         DateTime? @db.Date
+  created_at      DateTime  @default(now()) @db.Timestamp(0)
+  updated_at      DateTime  @default(now()) @db.Timestamp(0)
+  vehicle         vehicle   @relation(fields: [vehicle_id], references: [vehicle_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_vf_vehicle")
+
+  @@index([vehicle_id], map: "fk_vf_vehicle_idx")
+}
+
+model vehicle_model {
+  vehicle_model_id Int           @id @default(autoincrement())
+  vehicle_brand_id Int
+  name             String        @db.VarChar(45)
+  vehicle_brand    vehicle_brand @relation(fields: [vehicle_brand_id], references: [vehicle_brand_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_vm_vb")
+  vehicle          vehicle[]
+
+  @@index([vehicle_brand_id], map: "fk_vm_vb_idx")
+}
+
+model vehicle_type {
+  vehicle_type_id Int              @id @default(autoincrement())
+  vi_name         String           @db.VarChar(15)
+  en_name         String           @db.VarChar(15)
+  type            Int
+  seat_number     Int
+  available       Boolean          @default(true)
+  driver_license  driver_license[]
+  service         service[]
+  vehicle_brand   vehicle_brand[]
+}
+
+model vnpay_token {
+  id          BigInt              @id @default(autoincrement()) @db.UnsignedBigInt
+  customer_id String              @db.VarChar(16)
+  token       String              @db.VarChar(256)
+  bank_code   String?             @db.VarChar(100)
+  card_type   String?             @db.VarChar(100)
+  card_number String?             @db.VarChar(100)
+  status      vnpay_token_status? @default(active)
+}
+
+enum businesscard_status {
+  active
+  inactive
+}
+
+enum merged_region_status {
+  active
+  inactive
+}
+
+enum otp_status {
+  created
+  solving
+  success
+  failed
+}
+
+enum businessoffice_type {
+  prepaid
+  postpaid
+  marketing
+}
+
+enum vnpay_token_status {
+  active
+  inactive
+}
+
+enum businessoffice_status {
+  expired
+  terminated
+  default
+}
+
+enum service_service_type {
+  fixed
+  car
+  taxi
+  other
+}
