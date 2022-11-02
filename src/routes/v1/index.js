@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import config from '../../config/config'
 import authRoute from './auth.route'
+import docsRoute from './docs.route'
 
 const router = Router()
 
@@ -13,10 +14,10 @@ const defaultRoutes = [
 
 const devRoutes = [
   // routes available only in development mode
-  // {
-  //   path: '/docs',
-  //   route: docsRoute,
-  // },
+  {
+    path: '/docs',
+    route: docsRoute,
+  },
 ]
 
 defaultRoutes.forEach((route) => {

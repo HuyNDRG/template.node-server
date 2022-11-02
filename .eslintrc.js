@@ -16,5 +16,9 @@ module.exports = {
     quotes: ['error', 'single'],
     semi: ['error', 'never'],
     'no-unused-vars': ['error', { vars: 'all', args: 'after-used', ignoreRestSiblings: false }],
+    'no-console': 'error',
+    'func-names': 'off',
+    'no-underscore-dangle': 'off',
+    'consistent-return': 'off',
   },
 }
