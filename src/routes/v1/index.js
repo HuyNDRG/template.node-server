@@ -1,6 +1,6 @@
 import { Router } from 'express'
-import { env } from '../../config/config.js'
-import authRoute from './auth.route.js'
+import config from '../../config/config'
+import authRoute from './auth.route'
 
 const router = Router()
 
@@ -24,7 +24,7 @@ defaultRoutes.forEach((route) => {
 })
 
 /* istanbul ignore next */
-if (env === 'development') {
+if (config.env === 'development') {
   devRoutes.forEach((route) => {
     router.use(route.path, route.route)
   })

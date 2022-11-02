@@ -1,8 +1,7 @@
-import Joi from 'joi'
 import httpStatus from 'http-status'
-import pick from '../utils/pick.js'
-import ApiError from '../utils/ApiError.js'
-import logger from '../config/logger.js'
+import Joi from 'joi'
+import ApiError from '../utils/ApiError'
+import pick from '../utils/pick'
 
 const { BAD_REQUEST } = httpStatus
 

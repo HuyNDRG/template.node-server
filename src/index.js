@@ -1,5 +1,5 @@
-import { startExpress } from './app.js'
-import logger from './config/logger.js'
+import { startExpress } from './app'
+import logger from './config/logger'
 
 let server = startExpress()
 

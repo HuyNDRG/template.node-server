@@ -1,11 +1,10 @@
 {
-  "name": "ac-sync-server",
+  "name": "template.node-server",
   "version": "0.0.1",
-  "description": "Synchorize data between local and cloud for Access control",
+  "description": "",
   "main": "index.js",
-  "type": "module",
   "scripts": {
-    "dev": "nodemon src/index.js",
+    "dev": " nodemon --exec babel-node src/index.js",
     "prisma:update": "npx prisma db pull --schema src/prisma/maindb.schema.prisma && npx prisma db pull --schema src/prisma/subdb.schema.prisma",
     "prisma:generate": "npx prisma generate --schema src/prisma/maindb.schema.prisma && npx prisma generate --schema src/prisma/subdb.schema.prisma"
   },
@@ -20,12 +19,17 @@
     "helmet": "^5.1.1",
     "http-status": "^1.5.2",
     "joi": "^17.6.0",
-    "mysql2": "^2.3.3",
+    "morgan": "^1.10.0",
     "prisma": "^4.5.0",
     "winston": "^3.8.1",
     "xss-clean": "^0.1.1"
   },
   "devDependencies": {
+    "@babel/cli": "^7.19.3",
+    "@babel/core": "^7.19.6",
+    "@babel/node": "^7.20.0",
+    "@babel/preset-env": "^7.19.4",
+    "eslint": "^8.26.0",
     "nodemon": "^2.0.19",
     "prettier": "^2.7.1"
   }

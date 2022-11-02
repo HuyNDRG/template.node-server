@@ -1,19 +1,12 @@
 import dotenv from 'dotenv'
-import path, { dirname } from 'path'
-import { fileURLToPath } from 'url'
+dotenv.config()
 
-const __dirname = dirname(fileURLToPath(import.meta.url))
-const pathEnv = path.join(__dirname, '../../.env')
-
-dotenv.config({ path: pathEnv })
-
-export const env = process.env.NODE_ENV
-export const port = process.env.PORT || 3000
+const env = process.env.NODE_ENV
+const port = process.env.PORT || 3000
 export const database = {
-  host: process.env.DB_HOST,
-  user: process.env.DB_USERNAME,
-  database: process.env.DB_NAME,
-  password: process.env.DB_PASSWORD,
+  prismaDbMain: process.env.PRISMA_DB_MAIN,
+  prismaDbMainRead: process.env.PRISMA_DB_MAIN_READ,
+  prismaDbSub: process.env.PRISMA_DB_SUB,
 }
 
 const config = { env, port, database }

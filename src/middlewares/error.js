@@ -1,8 +1,8 @@
 import httpStatus from 'http-status'
+import config from '../config/config'
+import logger from '../config/logger'
+import ApiError from '../utils/ApiError'
 const { INTERNAL_SERVER_ERROR } = httpStatus
-import { env } from '../config/config.js'
-import logger from '../config/logger.js'
-import ApiError from '../utils/ApiError.js'
 
 export const errorConverter = (err, req, res, next) => {
   let error = err
@@ -14,9 +14,9 @@ export const errorConverter = (err, req, res, next) => {
   next(error)
 }
 
-export const errorHandler = (err, req, res, next) => {
+export const errorHandler = (err, req, res) => {
   let { statusCode, message } = err
-  if (env === 'production' && !err.isOperational) {
+  if (config.env === 'production' && !err.isOperational) {
     statusCode = INTERNAL_SERVER_ERROR
     message = httpStatus[INTERNAL_SERVER_ERROR]
   }
@@ -26,10 +26,10 @@ export const errorHandler = (err, req, res, next) => {
   const response = {
     code: statusCode,
     message,
-    ...(env === 'development' && { stack: err.stack }),
+    ...(config.env === 'development' && { stack: err.stack }),
   }
 
-  if (env === 'development') {
+  if (config.env === 'development') {
     logger.error(err)
   }
 
