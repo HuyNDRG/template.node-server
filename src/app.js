@@ -1,4 +1,5 @@
 import compression from 'compression'
+import cookieParser from 'cookie-parser'
 import cors from 'cors'
 import express from 'express'
 import helmet from 'helmet'
@@ -24,7 +25,19 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 app.use(xss())
 app.use(compression())
-app.use(cors())
+app.use(cookieParser())
+app.use(
+  cors({
+    credentials: true,
+    origin: function (origin, callback) {
+      if (config.whitelist.includes(origin)) {
+        callback(null, true)
+      } else {
+        callback(new Error('Not allowed by CORS'))
+      }
+    },
+  })
+)
 app.options('*', cors())
 
 app.get('/', (req, res) => res.send('Welcome to the server'))

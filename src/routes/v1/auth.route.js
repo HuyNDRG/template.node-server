@@ -5,7 +5,8 @@ import authValidation from '../../validations/auth.validation.js'
 
 const authRoute = Router()
 
-authRoute.route('/login').get(validate(authValidation.login), authController.login)
+authRoute.route('/login').post(validate(authValidation.login), authController.login)
+authRoute.route('/me').get(authController.me)
 
 export default authRoute
 

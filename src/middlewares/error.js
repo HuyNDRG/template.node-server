@@ -14,7 +14,7 @@ export const errorConverter = (err, req, res, next) => {
   next(error)
 }
 
-export const errorHandler = (err, req, res) => {
+export const errorHandler = (err, req, res, next) => {
   let { statusCode, message } = err
   if (config.env === 'production' && !err.isOperational) {
     statusCode = INTERNAL_SERVER_ERROR
@@ -25,6 +25,7 @@ export const errorHandler = (err, req, res) => {
 
   const response = {
     code: statusCode,
+    success: false,
     message,
     ...(config.env === 'development' && { stack: err.stack }),
   }
